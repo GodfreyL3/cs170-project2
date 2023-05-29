@@ -50,17 +50,17 @@ class Classifier:
         for row in data:
             # Keeps track of the feature point we are looking at
             data_point = 0
-            for point in col:
+            for point in row:
                 # If the data point (represented by a number) is not in the test set, then exlude it by setting itto 0
                 if data_point not in test_set:
                     point = '0' # Do we need this?
                     
                     #   Set to 0
-                    data[col_num][data_point] = '0'
+                    data[row_num][data_point] = '0'
                 
                 # Increments
                 data_point += 1
-            col_num += 1
+            row_num += 1
 
         # Once we are done exluding our feature set being tested, now we must test the model
         
@@ -76,7 +76,7 @@ class Classifier:
             label = float(row[0])
 
             # object 
-            object = point[1:]
+            object = row[1:]
 
             #   Set both nearest-neighbor distance and locations to infinity by default
             nn_distance = float('inf')
@@ -93,8 +93,8 @@ class Classifier:
 
                     # get euclidian distance 
                     distance = 0
-                    for x in range(1, len(point)):
-                        distance += math.pow((float(point[x]) - float(neighbor[x])), 2)
+                    for x in range(1, len(row)):
+                        distance += math.pow((float(row[x]) - float(neighbor[x])), 2)
                         distance = math.sqrt(distance)
                         
                     # If the distance of the neighbor data point (k) is closer to the point being tested (i) than we is currently
