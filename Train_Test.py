@@ -1,9 +1,13 @@
 import random
 import numpy as np
 import math
-
+from sklearn.model_selection import train_test_split
 # Change this to change the dataset used
 filename = 'small-test-dataset.txt'
+filename2 = 'large-test-dataset-1.txt'
+
+featureSmall = [3, 5, 7]
+featureLarge = [1, 15, 27]
 
 # This will be used to keep track of the best accuracy found when exploring feature sets.
 best_acc = 0
@@ -127,6 +131,10 @@ class Classifier:
         accuracy = num_correctly_classified / len(data)
 
         return accuracy
+    
+    
+    
+   
 
     def train(self):
 
@@ -199,15 +207,10 @@ class Classifier:
         print(self.best_feature_data)
         
 
-
-    
-
-
-    
-
-
-
-
+    def test(self, featureSet):
+         for feature in featureSet:
+            accuracy = self.leave_one_out_cross_val(self.data, featureSet, feature)
+            print("Test accuracy with feature ", feature, ": ", str(accuracy))
 
 def main():
     # data = []
@@ -218,12 +221,16 @@ def main():
 
     # feature_search_demo(data)
 
-    data = np.loadtxt(filename, dtype=str, usecols=range(11))
-
+    data = np.loadtxt(filename, usecols=range(11))
+    data2 = np.loadtxt(filename2, usecols = range(41))
+    
     classifier = Classifier(data)
+    classifier2 = Classifier(data2)
     classifier.train()
-
-
+    # classifier2.train()
+    classifier.test(featureSmall)
+    # classifier2.test(featureLarge)
+    
 
 
 if __name__ == "__main__":
