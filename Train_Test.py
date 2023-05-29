@@ -12,6 +12,7 @@ featureLarge = [1, 15, 27]
 # This will be used to keep track of the best accuracy found when exploring feature sets.
 best_acc = 0
 
+# separate classes for validation and training
 
 class Classifier:
 
