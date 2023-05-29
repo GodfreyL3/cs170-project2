@@ -1,9 +1,13 @@
 import random
 import numpy as np
 import math
-
+from sklearn.model_selection import train_test_split
 # Change this to change the dataset used
 filename = 'small-test-dataset.txt'
+filename2 = 'large-test-dataset-1.txt'
+
+featureSmall = [3, 5, 7]
+featureLarge = [1, 15, 27]
 
 # This will be used to keep track of the best accuracy found when exploring feature sets.
 best_acc = 0
@@ -127,6 +131,10 @@ class Classifier:
         accuracy = num_correctly_classified / len(data)
 
         return accuracy
+    
+    
+    
+   
 
     def train(self):
 
@@ -199,43 +207,10 @@ class Classifier:
         print(self.best_feature_data)
         
 
-
-    
-
-
-    
-
-
-
-    def test(self, instance_id):
-        # select the instance from the data using its ID
-        test_instance = self.best_feature_data[instance_id]
-
-        # Set both nearest-neighbor distance and locations to infinity by default
-        nn_distance = float('inf')
-        nn_location = float('inf')
-
-        # For each data point (neighbor) in data
-        for idx, neighbor in enumerate(self.best_feature_data):
-            # assuming we are not comparing the same datapoint
-            if idx != instance_id:
-                # get euclidean distance 
-                distance = 0
-                for x in range(1, len(test_instance)):
-                    distance += math.pow((float(test_instance[x]) - float(neighbor[x])), 2)
-                    distance = math.sqrt(distance)
-
-                # If the distance of the neighbor data point (k) is closer to the point being tested (i) than we is currently
-                # the closest nearest-neighbor, set a new nearest neighbor (k)
-                if distance < nn_distance:
-                    #   Set distance
-                    nn_distance = distance
-                    #   Set the location (id) of neighbor (-1 is added because i starts at 1)
-                    nn_location = idx
-                    #   Get the class label of the point
-                    nn_label = float(self.best_feature_data[nn_location][0])
-        return nn_label
-
+    def test(self, featureSet):
+         for feature in featureSet:
+            accuracy = self.leave_one_out_cross_val(self.data, featureSet, feature)
+            print("Test accuracy with feature ", feature, ": ", str(accuracy))
 
 def main():
     # data = []
@@ -246,14 +221,16 @@ def main():
 
     # feature_search_demo(data)
 
-    data = np.loadtxt(filename, dtype=str, usecols=range(11))
-
+    data = np.loadtxt(filename, usecols=range(11))
+    data2 = np.loadtxt(filename2, usecols = range(41))
+    
     classifier = Classifier(data)
+    classifier2 = Classifier(data2)
     classifier.train()
-    test_instance_id = 3  # or any other ID
-    predicted_class_label = classifier.test(test_instance_id)
-    print(f'The predicted class label for the test instance {test_instance_id} is: {predicted_class_label}')
-
+    # classifier2.train()
+    classifier.test(featureSmall)
+    # classifier2.test(featureLarge)
+    
 
 
 if __name__ == "__main__":
