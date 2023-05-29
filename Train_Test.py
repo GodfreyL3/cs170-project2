@@ -207,6 +207,34 @@ class Classifier:
 
 
 
+    def test(self, instance_id):
+        # select the instance from the data using its ID
+        test_instance = self.best_feature_data[instance_id]
+
+        # Set both nearest-neighbor distance and locations to infinity by default
+        nn_distance = float('inf')
+        nn_location = float('inf')
+
+        # For each data point (neighbor) in data
+        for idx, neighbor in enumerate(self.best_feature_data):
+            # assuming we are not comparing the same datapoint
+            if idx != instance_id:
+                # get euclidean distance 
+                distance = 0
+                for x in range(1, len(test_instance)):
+                    distance += math.pow((float(test_instance[x]) - float(neighbor[x])), 2)
+                    distance = math.sqrt(distance)
+
+                # If the distance of the neighbor data point (k) is closer to the point being tested (i) than we is currently
+                # the closest nearest-neighbor, set a new nearest neighbor (k)
+                if distance < nn_distance:
+                    #   Set distance
+                    nn_distance = distance
+                    #   Set the location (id) of neighbor (-1 is added because i starts at 1)
+                    nn_location = idx
+                    #   Get the class label of the point
+                    nn_label = float(self.best_feature_data[nn_location][0])
+        return nn_label
 
 
 def main():
@@ -222,7 +250,9 @@ def main():
 
     classifier = Classifier(data)
     classifier.train()
-
+    test_instance_id = 3  # or any other ID
+    predicted_class_label = classifier.test(test_instance_id)
+    print(f'The predicted class label for the test instance {test_instance_id} is: {predicted_class_label}')
 
 
 
