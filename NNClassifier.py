@@ -47,7 +47,7 @@ class Validator:
         #feature_set is the list of features to use
         self.feature_set = feature_set
 
-    def leave_one_out(self):
+    def leave_one_out(self, true_Y):
         #get the number of rows in the data
         n = self.X.shape[0]
         print("n:",n)
@@ -84,12 +84,15 @@ class Validator:
             classifier = NNClassifier(Y_train_new,X_train_new,1)
             #predict the class of the ith row
             y_pred[i] = classifier.predict(x)
-        return y_pred
+
+        accuracy = np.mean(y_pred == true_Y)
+        
+        return accuracy
 
 
     
 def main():
-    filename = "large-test-dataset-1.txt"
+    filename = "large-test-dataset.txt"
     # load the data for the large test dataset set to 41 for small set to 11
     data = np.loadtxt(filename, usecols=range(41))
     Y = data[:, 0]
@@ -103,11 +106,10 @@ def main():
     # create a validator object
     validator = Validator( X,Y, classifier, feature_set)
 
-    y_pred = validator.leave_one_out()
+    accuracy = validator.leave_one_out(Y)
     #print("Predictions:", y_pred)
     
     # Compare y_pred with actual values
-    accuracy = np.mean(y_pred == Y)
     print("Accuracy:", accuracy)
 
 main()
