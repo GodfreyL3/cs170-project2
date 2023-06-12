@@ -144,10 +144,67 @@ class Algo:
                 print("\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
                 print("Best feature set is still " + str(self.best_features) + " at " + str(best_overall * 100) + "%")
             
-             # once we find our best feature add it to the current set of features
+            # once we find our best feature add it to the current set of features
             self.current_set.append(feature_to_add)        
             print("On level " + str(level) + " the feature " + str(feature_to_add) + " was added to the current set\n")
+        
+    def backward_elimination(self, labels, datapoints):
 
+        # Create Classifier
+        classifier = NNClassifier(labels, datapoints, 1)
+
+        best_overall = 0
+
+        # Create set of features
+        num_feature_points = list(range(1, datapoints[1].size + 1))
+        self.current_set = num_feature_points.copy()
+
+        # Still keep track of best
+        best_overall = 0
+        for level in num_feature_points:
+            print("On the " + str(level) + "th level of the elimination tree...")
+
+            if level >= (len(num_feature_points)):
+                break
+
+            feature_to_remove = 0
+            best_accuracy = 0
+
+            for feature in num_feature_points:
+                    
+                # If feature is not in our set, skip
+                if feature not in self.current_set:
+                    continue
+                
+                # Create test set, with the feature removed
+                print("--Considering eliminating the " + str(feature) + "th feature...")
+                test_set = self.current_set.copy()
+                test_set.remove(feature)
+
+                # Create Validator
+                validator = Validator(datapoints, labels, classifier, test_set)
+
+                # Get accuracy
+                accuracy = validator.leave_one_out(labels)
+
+                print("Using Feature set " + str(test_set) + ", getting accuracy of " + str(accuracy * 100) + "%.")
+
+                # Here we are trying to find the best feature to add given our current set of features that would give us the best score
+                if accuracy > best_accuracy:
+                    best_accuracy = accuracy
+                    feature_to_remove = feature
+                    print("\nFeature " + str(feature) + " removed from set " + str(test_set) + " is best at " + str(accuracy * 100) + "%.\n")
+
+            if best_accuracy > best_overall:
+                best_overall = best_accuracy
+                self.best_features = test_set.copy()
+            else:
+                print("\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+                print("Best feature set is still " + str(self.best_features) + " at " + str(best_overall * 100) + "%")
+
+            # once we find our best feature add it to the current set of features
+            self.current_set.remove(feature_to_remove)        
+            print("On level " + str(level) + " the feature " + str(feature_to_remove) + " was removed from the current set\n")
 
 
 
@@ -194,15 +251,15 @@ class Visualizer:
 
 
 def main():
-    filename = "large-test-dataset.txt"
+    filename = "small-test-dataset.txt"
     # load the data for the large test dataset set to 41 for small set to 11
-    data = np.loadtxt(filename, usecols=range(41))
+    data = np.loadtxt(filename, usecols=range(11))
     Y = data[:, 0]
     # get the rest of the columns and set to X
     X = data[:, 1:]
 
     algo = Algo()
-    algo.forward_selection(Y,X)
+    algo.backward_elimination(Y,X)
 
     # create a classifier object
     classifier = NNClassifier(Y, X, 1)
