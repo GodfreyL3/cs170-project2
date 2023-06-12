@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class NNClassifier:
     def __init__(self,Y,X,K) -> None:
@@ -55,7 +56,6 @@ class Validator:
         # Get number of features in the data
         d = self.X.shape[1]
         print("d:",d)
-
         #build the training set using the feature set
         #get the columns of the data that are in the feature set 
         for i in range(len(self.feature_set)):
@@ -77,7 +77,7 @@ class Validator:
             #remove the ith row from the labels
             Y_train_new = np.delete(self.Y,i)
             #create a new classifier object
-            classifier = NNClassifier(Y_train_new,X_train_new,1)
+            classifier = NNClassifier(Y_train_new,X_train_new,self.classifier.K)
             #predict the class of the ith row
             y_pred[i] = classifier.predict(x)
 
@@ -143,7 +143,49 @@ class Algo:
 
 
 
-    
+
+class Visualizer:
+    def __init__(self,X,Y) -> None:
+        self.X = X
+        self.Y = Y
+
+    def plot(self,feature_set):
+        #check length of feature set (if 2 then 2d plot if 3 then 3d plot)
+        if len(feature_set) == 2:
+            is_2d = True
+            is_3d = False
+        elif len(feature_set) == 3:
+            is_2d = False
+            is_3d = True
+        else:
+            is_2d = False
+            is_3d = False
+        
+        for i in range(len(feature_set)):
+            #NOTE that we are using the feature set as a list of columns and the lists starts at 1 not 0
+            if i == 0:
+                X_features = self.X[:,feature_set[i]-1]
+            else:
+                X_features = np.vstack((X_features,self.X[:,feature_set[i]-1]))
+        #transpose the training set so that the rows are the features and the columns are the data points
+        X_features = X_features.T
+        # dot plot of the data set the labels as feature values
+        if is_2d:
+            plt.scatter(X_features[:, 0], X_features[:, 1], c=self.Y)
+            plt.xlabel("Feature {}".format(feature_set[0]))
+            plt.ylabel("Feature {}".format(feature_set[1]))
+            plt.show()
+        elif is_3d:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(X_features[:, 0], X_features[:, 1], X_features[:, 2], c=self.Y)
+            ax.set_xlabel("Feature {}".format(feature_set[0]))
+            ax.set_ylabel("Feature {}".format(feature_set[1]))
+            ax.set_zlabel("Feature {}".format(feature_set[2]))
+            plt.show()
+        return None
+
+
 def main():
     filename = "large-test-dataset.txt"
     # load the data for the large test dataset set to 41 for small set to 11
@@ -167,5 +209,9 @@ def main():
     
     # Compare y_pred with actual values
     print("Accuracy:", accuracy)
+
+    # Visualize the data
+    visualizer = Visualizer(X,Y)
+    visualizer.plot(feature_set)
 
 main()
