@@ -1,3 +1,16 @@
+# Group: 
+# - Godfrey Lozada, gloza013, 001
+# - Johnny To, jto015, 001
+# - James Ta, jta---, 001
+# - Howie Nguyen, hnguy431
+# Dataset: Spring 2023 Dataset #46
+# Small Dataset Results:
+# - Forward: {10, 9}, Accuracy 0.93
+# - Backward: {1, 3} Accuracy 0.91
+# Large Dataset Results:
+# - Forward: {33, 29} Accuracy 0.969
+# - Backward: {9, 12, 13, 15, 20, 23, 25, 30, 32, 35, 37} Accuracy 0.806
+
 import numpy as np
 import matplotlib.pyplot as plt
 
