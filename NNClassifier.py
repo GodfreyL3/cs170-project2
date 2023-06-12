@@ -147,8 +147,7 @@ class Algo:
             # once we find our best feature add it to the current set of features
             self.current_set.append(feature_to_add)        
             print("On level " + str(level) + " the feature " + str(feature_to_add) + " was added to the current set\n")
-
-        return best_overall
+        return self.best_features
         
     def backward_elimination(self, labels, datapoints):
 
@@ -207,8 +206,7 @@ class Algo:
             # once we find our best feature add it to the current set of features
             self.current_set.remove(feature_to_remove)        
             print("On level " + str(level) + " the feature " + str(feature_to_remove) + " was removed from the current set\n")
-
-        return best_overall
+        return self.best_features
 
 
 
@@ -254,32 +252,95 @@ class Visualizer:
         return None
 
 
+def printMenu_Dataset():
+    print("=====================================================")
+    print("Welcome to the Feature Selection Algorithm")
+    print("Which data set would you like to use?")
+    print("=====================================================")
+    print("1) Small Sample Data Set")
+    print("2) Large Sample Data Set")
+    print("3) Small Data Set #46")
+    print("4) Large Data Set #46")
+    print("0) Exit")
+
+def printMenu_Algorithm():
+    print("=====================================================")
+    print("Type the number of the algorithm you want to run.")
+    print("=====================================================")
+    print("1) Forward Selection")
+    print("2) Backward Elimination")
+    print("0) Exit")
+
+def printPlotMenu():
+    print("=====================================================")
+    print("Would you like to plot the results?")
+    print("=====================================================")
+    print("1) Yes")
+    print("2) No")
+
+
+
 def main():
-    filename = "CS170_Spring_2023_Large_data__46.txt"
-    # load the data for the large test dataset set to 41 for small set to 11
-    data = np.loadtxt(filename, usecols=range(41))
+    printMenu_Dataset()
+    #get the user input
+    user_input = int(input())
+    #if the user input is 0 then exit the program
+    if user_input == 0:
+        exit()
+    #if the user input is 1 then load the small data set
+    elif user_input == 1:
+        data = np.loadtxt("small-test-dataset.txt", usecols=range(11))
+    #if the user input is 2 then load the large data set
+    elif user_input == 2:
+        data = np.loadtxt("large-test-dataset.txt", usecols=range(41))
+    #if the user input is 3 then load the small data set
+    elif user_input == 3:
+        data = np.loadtxt("CS170_Spring_2023_Small_data__46.txt", usecols=range(11))
+    #if the user input is 4 then load the large data set
+    elif user_input == 4:
+        data = np.loadtxt("CS170_Spring_2023_Large_data__46.txt", usecols=range(41))
+    else:
+        print("Invalid Input")
+        exit()
+
+    #get the labels and the data points
     Y = data[:, 0]
-    # get the rest of the columns and set to X
     X = data[:, 1:]
 
+    printMenu_Algorithm()
+    #get the user input
+    user_input = int(input())
+    #if the user input is 0 then exit the program
     algo = Algo()
-    accuracy = algo.forward_selection(Y,X)
-
-    # create a classifier object
-    #classifier = NNClassifier(Y, X, 1)
-    # create a feature set columns are in 1,2,3,4,5,6,7,8,9,10
-    #feature_set = [1]
-    # create a validator object
-    #validator = Validator( X,Y, classifier, feature_set)
-
-    #accuracy = validator.leave_one_out(Y)
-    #print("Predictions:", y_pred)
+    if user_input == 0:
+        exit()
+    #if the user input is 1 then run the forward selection algorithm
+    elif user_input == 1:
+        feature_set = algo.forward_selection(Y,X)
+    #if the user input is 2 then run the backward elimination algorithm
+    elif user_input == 2:
+        feature_set = algo.backward_elimination(Y,X)
+    else:
+        print("Invalid Input")
+        exit()
     
-    # Compare y_pred with actual values
-    print("Accuracy:", accuracy)
+    if (len(feature_set) <= 3):
+        printPlotMenu()
+        #get the user input
+        user_input = int(input())
+        #if the user input is 1 then plot the results
+        if user_input == 1:
+            print("Plotting the results...")
+            visualizer = Visualizer(X,Y)
+            visualizer.plot(feature_set)
+        #if the user input is 2 then exit the program
+        elif user_input == 2:
+            exit()
+        else:
+            print("Invalid Input")
+            exit()
 
-    # Visualize the data
-    #visualizer = Visualizer(X,Y)
-    #visualizer.plot(feature_set)
+    print("~Bye Bye")
+
 
 main()
