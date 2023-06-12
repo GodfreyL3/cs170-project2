@@ -48,30 +48,25 @@ class Validator:
         #feature_set is the list of features to use
         self.feature_set = feature_set
 
-    def leave_one_out(self):
-        #get the number of rows in the data
+    def leave_one_out(self, true_Y):
+
+        # Get number of rows in the data
         n = self.X.shape[0]
-        #print("n:",n)
-        #get the number of features in the data
+        print("n:",n)
+        # Get number of features in the data
         d = self.X.shape[1]
-        #print("d:",d)
+        print("d:",d)
         #build the training set using the feature set
         #get the columns of the data that are in the feature set 
         for i in range(len(self.feature_set)):
             #NOTE that we are using the feature set as a list of columns and the lists starts at 1 not 0
             if i == 0:
-                X_train = self.X[:,self.feature_set[i]-1]
+                X_train = self.X[:, self.feature_set[i] - 1].reshape(-1, 1) # Ensure we have two dimensions
             else:
-                X_train = np.vstack((X_train,self.X[:,self.feature_set[i]-1]))
-        #transpose the training set so that the rows are the features and the columns are the data points
-        X_train = X_train.T
-        #get the shape of the training set
-        #print("X_train shape:",X_train.shape)
-        #get the shape of the labels
-        #print("Y shape:",self.Y.shape)
-        #create a list to hold the predictions
+                X_train = np.hstack((X_train, self.X[:, self.feature_set[i] - 1].reshape(-1, 1)))
+
         y_pred = np.zeros(n)
-        #for each row in the data
+
         for i in range(n):
             #get the ith row of the data
             x = X_train[i,:]
@@ -85,7 +80,67 @@ class Validator:
             classifier = NNClassifier(Y_train_new,X_train_new,self.classifier.K)
             #predict the class of the ith row
             y_pred[i] = classifier.predict(x)
-        return y_pred
+
+        accuracy = np.mean(y_pred == true_Y)
+        return accuracy
+
+    
+class Algo:
+
+    def __init__(self) -> None:
+        self.current_set = []
+
+        self.best_features = []
+
+
+    def forward_selection(self, labels, datapoints):
+
+        # Create Classifier
+        classifier = NNClassifier(labels, datapoints, 1)
+
+        best_overall = 0
+
+        # Create set of features
+        num_feature_points = list(range(1, datapoints[1].size + 1))
+
+        for level in num_feature_points:
+            print("On the " + str(level) + "th level of the search tree...")
+
+            feature_to_add = 0
+            best_accuracy = 0
+
+            for feature in num_feature_points:
+
+                # If feature is already in set, skip
+                if feature in self.current_set:
+                    continue
+
+                # Create test set
+                print("--Considering adding the " + str(feature) + "th feature...")
+                test_set = self.current_set.copy()
+                test_set.append(feature)
+
+                # Create Validator
+                validator = Validator(datapoints, labels, classifier, test_set)
+
+                # Get accuracy
+                accuracy = validator.leave_one_out(labels)
+
+                # Here we are trying to find the best feature to add given our current set of features that would give us the best score
+                if accuracy > best_accuracy:
+                    best_accuracy = accuracy
+                    feature_to_add = feature
+
+            # If the accuracy found from the cross-validation test is better than anything previously
+            # replace and record the set that got this best combination and accuracy
+            if best_accuracy > best_overall:
+                best_overall = best_accuracy
+                self.best_features.append(feature_to_add)
+            
+             # once we find our best feature add it to the current set of features
+            self.current_set.append(feature_to_add)        
+            print("On level " + str(level) + " the feature " + str(feature_to_add) + " was added to the current set\n")
+
 
 
 
@@ -132,25 +187,27 @@ class Visualizer:
 
 
 def main():
-    filename = "CS170_Spring_2023_Large_data__46.txt"
+    filename = "large-test-dataset.txt"
     # load the data for the large test dataset set to 41 for small set to 11
     data = np.loadtxt(filename, usecols=range(41))
     Y = data[:, 0]
     # get the rest of the columns and set to X
     X = data[:, 1:]
 
-    # create a classifier object (BE ODD)s
-    classifier = NNClassifier(Y, X, 3)
+    algo = Algo()
+    algo.forward_selection(Y,X)
+
+    # create a classifier object
+    classifier = NNClassifier(Y, X, 1)
     # create a feature set columns are in 1,2,3,4,5,6,7,8,9,10
-    feature_set = [33,29]
+    feature_set = [1]
     # create a validator object
     validator = Validator( X,Y, classifier, feature_set)
 
-    y_pred = validator.leave_one_out()
+    accuracy = validator.leave_one_out(Y)
     #print("Predictions:", y_pred)
     
     # Compare y_pred with actual values
-    accuracy = np.mean(y_pred == Y)
     print("Accuracy:", accuracy)
 
     # Visualize the data
