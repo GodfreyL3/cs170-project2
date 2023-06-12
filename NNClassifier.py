@@ -147,6 +147,8 @@ class Algo:
             # once we find our best feature add it to the current set of features
             self.current_set.append(feature_to_add)        
             print("On level " + str(level) + " the feature " + str(feature_to_add) + " was added to the current set\n")
+
+        return best_overall
         
     def backward_elimination(self, labels, datapoints):
 
@@ -206,6 +208,8 @@ class Algo:
             self.current_set.remove(feature_to_remove)        
             print("On level " + str(level) + " the feature " + str(feature_to_remove) + " was removed from the current set\n")
 
+        return best_overall
+
 
 
 class Visualizer:
@@ -251,31 +255,31 @@ class Visualizer:
 
 
 def main():
-    filename = "small-test-dataset.txt"
+    filename = "CS170_Spring_2023_Large_data__46.txt"
     # load the data for the large test dataset set to 41 for small set to 11
-    data = np.loadtxt(filename, usecols=range(11))
+    data = np.loadtxt(filename, usecols=range(41))
     Y = data[:, 0]
     # get the rest of the columns and set to X
     X = data[:, 1:]
 
     algo = Algo()
-    algo.backward_elimination(Y,X)
+    accuracy = algo.forward_selection(Y,X)
 
     # create a classifier object
-    classifier = NNClassifier(Y, X, 1)
+    #classifier = NNClassifier(Y, X, 1)
     # create a feature set columns are in 1,2,3,4,5,6,7,8,9,10
-    feature_set = [1]
+    #feature_set = [1]
     # create a validator object
-    validator = Validator( X,Y, classifier, feature_set)
+    #validator = Validator( X,Y, classifier, feature_set)
 
-    accuracy = validator.leave_one_out(Y)
+    #accuracy = validator.leave_one_out(Y)
     #print("Predictions:", y_pred)
     
     # Compare y_pred with actual values
     print("Accuracy:", accuracy)
 
     # Visualize the data
-    visualizer = Visualizer(X,Y)
-    visualizer.plot(feature_set)
+    #visualizer = Visualizer(X,Y)
+    #visualizer.plot(feature_set)
 
 main()
