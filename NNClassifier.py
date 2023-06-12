@@ -1,8 +1,8 @@
 # Group: 
 # - Godfrey Lozada, gloza013, 001
 # - Johnny To, jto015, 001
-# - James Ta, jta---, 001
-# - Howie Nguyen, hnguy431
+# - James Ta, jta013, 001
+# - Howie Nguyen, hnguy431, 001
 # Dataset: Spring 2023 Dataset #46
 # Small Dataset Results:
 # - Forward: {10, 9}, Accuracy 0.93
