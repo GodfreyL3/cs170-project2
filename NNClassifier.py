@@ -51,10 +51,10 @@ class Validator:
 
         # Get number of rows in the data
         n = self.X.shape[0]
-        print("n:",n)
+        #print("n:",n)
         # Get number of features in the data
         d = self.X.shape[1]
-        print("d:",d)
+        #print("d:",d)
 
         #build the training set using the feature set
         #get the columns of the data that are in the feature set 
@@ -126,16 +126,22 @@ class Algo:
                 # Get accuracy
                 accuracy = validator.leave_one_out(labels)
 
+                print("Using Feature set" + str(test_set) + ", getting accuracy of " + str(accuracy * 100) + "%.")
+
                 # Here we are trying to find the best feature to add given our current set of features that would give us the best score
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     feature_to_add = feature
+                    print("\nFeature " + str(feature) + " Added to set " + str(test_set) + " is best at " + str(accuracy * 100) + "%.\n")
 
             # If the accuracy found from the cross-validation test is better than anything previously
             # replace and record the set that got this best combination and accuracy
             if best_accuracy > best_overall:
                 best_overall = best_accuracy
                 self.best_features.append(feature_to_add)
+            else:
+                print("\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+                print("Best feature set is still " + str(self.best_features) + " at " + str(best_overall * 100) + "%")
             
              # once we find our best feature add it to the current set of features
             self.current_set.append(feature_to_add)        
